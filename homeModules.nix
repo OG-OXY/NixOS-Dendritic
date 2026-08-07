@@ -1,0 +1,25 @@
+#homeModules.nix
+{
+  ...
+}:
+{
+  imports = [
+    ./modules/home/ai-chat.nix
+    ./modules/home/atuin.nix
+    ./modules/home/ghostty.nix
+    ./modules/home/tmux.nix
+    ./modules/home/fish.nix
+    ./modules/home/scripts.nix
+    ./modules/home/zoxide.nix
+    ./modules/home/yazi.nix
+    ./modules/home/hyprpaper.nix
+    ./modules/home/git.nix
+    ./modules/home/github-cli.nix
+    ./modules/home/jujutsu.nix
+    ./modules/home/ssh.nix
+    ./modules/home/gpg.nix
+    ./modules/home/rbw.nix
+    ./modules/home/fastfetch.nix
+    ./modules/home/luarc.nix
+  ];
+}

@@ -1,5 +1,5 @@
+#home.nix
 {
-  pkgs,
   ...
 }:
 {
@@ -13,19 +13,16 @@
       VISUAL = "nvf";
     };
     file = {
-      "secretspec.toml".source = ./config/secretspec/secretspec.toml;
-      "NixOS/secretspec.toml".source = ./config/secretspec/secretspec.toml;
+      "NixOS/secretspec.toml".text = ''
+        [project]
+        name = "global-dev"
+        revision = "1.0"
+
+        [profiles.default]
+        GITHUB_TOKEN = { description = "Global GitHub Access Token", id = "Github Token", field = "password" }
+        GOOGLE_API_KEY = { description = "Google API Key for Aider", command = "rbw get 'Google API Key'", required = false }
+      '';
       ".config/tealdeer/config.toml".source = ./config/tealdeer/config.toml;
-      ".config/hypr/.luarc.json".text = builtins.toJSON {
-        workspace = {
-          library = [
-            "${pkgs.hyprland}/share/hypr/stubs"
-          ];
-        };
-        diagnostics = {
-          globals = [ "hl" ];
-        };
-      };
     };
   };
 
@@ -36,6 +33,7 @@
         provider = "keyring"
         profile = "default"
       '';
+      "hypr/hyprland.lua".source = ./config/hypr/hyprland.lua;
     };
     dataFile = {
       #
@@ -49,21 +47,7 @@
   };
 
   imports = [
-    ./modules/home/ghostty.nix
-    ./modules/home/tmux.nix
-    ./modules/home/fish.nix
-    ./modules/home/atuin.nix
-    ./modules/home/fastfetch.nix
-    ./modules/home/yazi.nix
-    ./modules/home/git.nix
-    ./modules/home/github-cli.nix
-    ./modules/home/jujutsu.nix
-    ./modules/home/ssh.nix
-    ./modules/home/rbw.nix
-    ./modules/home/gpg.nix
-    ./modules/home/hyprpaper.nix
-    ./modules/home/ai-chat.nix
-    #./modules/home/litellm.nix
+    ./homeModules.nix
   ];
 
   programs = {

@@ -1,10 +1,18 @@
+#scripts.nix
 {
   pkgs,
   ...
 }:
 {
   home.packages = [
-    # 1. The Full Upgrade + Backup Loop
+    #(pkgs.writeScriptBin "regreet-wrapped" ''
+    #  #!/usr/bin/env bash
+    #  set -e \
+    #  (sleep 0.5 ${pkgs.wlr-randr}/bin/wlr-randr \
+    #  --output "ASUSTek COMPUTER INC ROG PG258Q #ASP9OUVfHcfd" --mode 1920x1080@240Hz --pos 0,0 \
+    #  --output "Dell Inc. DELL P2720D K6RX299P10LS" --mode 2560x1440@60Hz --pos 1920,-180 ) &
+    #  exec ${pkgs.regreet}/bin/regreet
+    #'')
     (pkgs.writeScriptBin "nix-upgrade-backup" ''
       #!/usr/bin/env bash
       set -e
@@ -65,8 +73,6 @@
 
       echo "✨ SYSTEM UPGRADE AND BACKUP SEQUENCE COMPLETED"
     '')
-
-    # 2. The Standalone Backup Utility (Excludes Upgrading)
     (pkgs.writeScriptBin "nix-backup" ''
       #!/usr/bin/env bash
       set -e

@@ -1,3 +1,4 @@
+#config.nix
 {
   pkgs,
   lib,
@@ -8,9 +9,7 @@
 
 {
   imports = [
-    ./modules/hardware/hardware.nix
-    ./modules/hardware/amd.nix
-    ./modules/hardware/nvidia.nix
+    ./systemModules.nix
   ];
 
   # Bootloader + GRUB parameters.
@@ -120,15 +119,10 @@
       withUWSM = true;
       xwayland.enable = true;
     };
-    neovim = {
-      enable = true;
-      defaultEditor = true;
-    };
     direnv = {
       enable = true;
       nix-direnv.enable = true;
     };
-    regreet.enable = true;
     fish.enable = true;
     zoxide.enable = true;
     gamemode.enable = true;
@@ -142,10 +136,6 @@
       nerd-fonts.jetbrains-mono
       nerd-fonts.fira-code
       font-awesome
-      comic-mono
-      fantasque-sans-mono
-      cozette
-      monaspace
       inter
     ];
     fontconfig = {
@@ -156,10 +146,6 @@
           "Font Awesome 6 Free"
           "Font Awesome 6 Brands"
           "FiraCode Nerd Font"
-          "Comic Mono"
-          "Fantasque Sans Mono"
-          "Cozette"
-          "Monaspace Neon"
           "Inter"
         ];
         sansSerif = [
@@ -168,21 +154,13 @@
           "Font Awesome 6 Brands"
           "JetBrainsMono Nerd Font"
           "FiraCode Nerd Font"
-          "Comic Mono"
-          "Fantasque Sans Mono"
-          "Cozette"
-          "Monaspace Neon"
         ];
         serif = [
-          "Comic Mono"
+          "Inter"
           "Font Awesome 6 Free"
           "Font Awesome 6 Brands"
           "JetBrainsMono Nerd Font"
           "FiraCode Nerd Font"
-          "Inter"
-          "Fantasque Sans Mono"
-          "Cozette"
-          "Monaspace Neon"
         ];
       };
       #localConf = ''
@@ -194,6 +172,10 @@
   # Install system PKGS.
   environment = {
     shells = with pkgs; [ fish ];
+    variables = {
+      CPATH = "/run/current-system/sw/include";
+      LIBRARY_PATH = "/run/current-system/sw/lib";
+    };
     sessionVariables = {
       NIXOS_OZONE_WL = "1";
       WLR_NO_HARDWARE_CURSORS = "1";
@@ -217,6 +199,13 @@
     systemPackages =
       with pkgs;
       [
+        stdenv.cc
+        binutils
+        gnumake
+        cmake
+        pkg-config
+        gdb
+        valgrind
         hyprpolkitagent
         watchman
         pinentry-gnome3
@@ -236,10 +225,12 @@
         nix-output-monitor
         nvd
         nh
+        just
         fh
         rbw
         secretspec
         rofi-rbw-wayland
+        mpd
         mpv
         imv
         hyprshot
@@ -273,6 +264,8 @@
         inputs.zen-browser.packages.${pkgs.system}.default
         inputs.nvf.packages.${pkgs.system}.default
         inputs.llm-agents.packages.${pkgs.system}.default
+        #pkgs.cudaPackages.cuda_nvcc
+        #pkgs.cudaPackages.cudatoolkit
       ];
     etc = {
     };
@@ -296,6 +289,52 @@
 
   # Display Manager.
   services = {
+    displayManager.regreet = {
+      enable = true;
+      cageArgs = [
+        "-s"
+        "-m"
+        "clone"
+      ];
+      settings = {
+        background = {
+          path = "/etc/nixos/wallpaper.png";
+          fit = "Cover";
+        };
+        #theme = {
+        #  package = "";
+        #  name = "";
+        #};
+        #iconTheme = {
+        #  package = "";
+        #  name = "";
+        #};
+        #cursorTheme = {
+        #  package = "";
+        #  name = "";
+        #};
+        #GTK = {
+        #  theme_name = "Adwaita-dark";
+        #  icon_theme_name = "Adwaita";
+        #  cursor_theme_name = "";
+        #  font_name = lib.mkDefault "Inter 11";
+        #};
+        commands = {
+          reboot = [
+            "doas"
+            "reboot"
+            "now"
+          ];
+          shutdown = [
+            "doas"
+            "shutdown"
+            "now"
+          ];
+        };
+        #extraCss = ''
+        #'';
+      };
+    };
     greetd.enable = true;
     kmscon.enable = true;
     tailscale.enable = true;
@@ -336,7 +375,14 @@
     };
     ollama = {
       enable = true;
-      package = pkgs.ollama-vulkan;
+      package =
+        (pkgs.ollama-cuda.override {
+        }).overrideAttrs
+          (oldAttrs: {
+            cmakeFlags = (oldAttrs.cmakeFlags or [ ]) ++ [
+              "-DCMAKE_CUDA_ARCHITECTURES=61"
+            ];
+          });
     };
     llama-cpp = {
       enable = true;
@@ -440,17 +486,17 @@
     oci-containers = {
       backend = "podman";
       containers = {
-        unsloth-proxy = {
-          image = "docker.io/unsloth/unsloth:latest";
-          autoStart = true;
-          ports = [ "4000:4000" ];
-          extraOptions = [ "--network=host" ];
-          cmd = [
-            "unsloth run \
-            -H 127.0.0.1 \
-            -p 4000"
-          ];
-        };
+        #unsloth-proxy = {
+        # image = "docker.io/unsloth/unsloth:latest";
+        # autoStart = true;
+        # ports = [ "4000:4000" ];
+        # extraOptions = [ "--network=host" ];
+        # cmd = [
+        #   "unsloth run \
+        #    -H 127.0.0.1 \
+        #     -p 4000"
+        #  ];
+        #};
       };
     };
   };
