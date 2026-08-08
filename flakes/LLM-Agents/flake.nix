@@ -1,5 +1,5 @@
 {
-  description = "AI Agent-Hub: Package & DevShell Targets";
+  description = "AI Agent-Hub Package with Devshell";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -10,37 +10,26 @@
   };
 
   outputs =
-    {
-      nixpkgs,
-      llm-agents,
-      ...
-    }:
+    { nixpkgs, llm-agents, ... }:
     let
       supportedSystems = [
         "x86_64-linux"
         "aarch64-linux"
       ];
-      forEachSystem =
-        f:
-        nixpkgs.lib.genAttrs supportedSystems (
-          system:
-          f (
-            import nixpkgs {
-              inherit system;
-              config.allowUnfree = true;
-            }
-          )
-        );
+      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
+      config = nixpkgs.config.allowUnfree;
     in
     {
-      packages = forEachSystem (
-        pkgs:
+      packages = forAllSystems (
+        system:
         let
           agents = llm-agents.packages.${pkgs.system};
+          pkgs = nixpkgs.legacyPackages.${system};
         in
         {
+          inherit config;
           default = pkgs.symlinkJoin {
-            name = "ai-agents-bundle";
+            name = "numtide_llm-agents";
             paths = [
               agents.claude-code
               agents.crush
@@ -50,21 +39,21 @@
         }
       );
 
-      devShells = forEachSystem (
-        pkgs:
+      devShells = forAllSystems (
+        system:
         let
           agents = llm-agents.packages.${pkgs.system};
+          pkgs = nixpkgs.legacyPackages.${system};
         in
         {
+          inherit config;
           default = pkgs.mkShell {
-            name = "agent-sandbox";
+            name = "numtide_llm-agents-shell";
             nativeBuildInputs = [
-              # Agents from Numtide
               agents.claude-code
               agents.crush
               agents.goose-cli
 
-              # Native utilities from nixpkgs
               pkgs.herdr
               pkgs.llama-cpp
               pkgs.nodejs_22
@@ -77,7 +66,6 @@
               pkgs.jq
               pkgs.git
             ];
-
             shellHook = ''
               echo "========================================================"
               echo " 🤖 AI AGENT SANDBOX ACTIVATED                          "

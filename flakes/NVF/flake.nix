@@ -1,5 +1,6 @@
 {
   description = "NVF Neovim IDE Flake";
+
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nvf = {
@@ -7,6 +8,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
+
   outputs =
     { nixpkgs, nvf, ... }:
     let
