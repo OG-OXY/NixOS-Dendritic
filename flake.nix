@@ -1,16 +1,25 @@
 #flake.nix
 {
-  description = "System and Home Manager configuration flake";
+  description = "System Flake";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-26.05";
     flake-parts.url = "github:hercules-ci/flake-parts";
+    import-tree.url = "github:denful/import-tree";
+    wrappers = {
+      url = "github:BirdeeHub/nix-wrapper-modules";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     chaotic = {
       url = "github:chaotic-cx/nyx";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
       url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    sops = {
+      url = "github:mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     stylix = {
@@ -30,8 +39,11 @@
       nixpkgs,
       nixpkgs-stable,
       flake-parts,
+      import-tree,
+      wrappers,
       chaotic,
       home-manager,
+      sops,
       stylix,
       ...
     }@inputs:
@@ -68,7 +80,10 @@
             hardware.enableRedistributableFirmware = true;
           }
           ./config.nix
+          import-tree.nixosModules.import-tree
+          wrappers.nixosModules.wrappers
           chaotic.nixosModules.default
+          sops.nixosModules.sops
           stylix.nixosModules.stylix
           home-manager.nixosModules.home-manager
           {

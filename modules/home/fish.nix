@@ -30,6 +30,12 @@
           secretspec run -- gh $argv
         '';
       };
+      ss = {
+        description = "For Grabbing secrets.";
+        body = ''
+          secretspec run -- $argv
+        '';
+      };
     };
 
     shellAbbrs = {

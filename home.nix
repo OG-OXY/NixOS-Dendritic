@@ -19,8 +19,8 @@
         revision = "1.0"
 
         [profiles.default]
-        GITHUB_TOKEN = { description = "Global GitHub Access Token", id = "Github Token", field = "password" }
-        GOOGLE_API_KEY = { description = "Google API Key for Aider", command = "rbw get 'Google API Key'", required = false }
+        GITHUB_TOKEN = { description = "Global GitHub Access token" }
+        GOOGLE_API_KEY = { description = "Google API Key for Aider" }
       '';
       ".config/tealdeer/config.toml".source = ./config/tealdeer/config.toml;
     };

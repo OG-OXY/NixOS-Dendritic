@@ -4,7 +4,7 @@
 }:
 {
   home.file = {
-    "./NixOS/Dendritic/config/hypr/.luarc.json".text = builtins.toJSON {
+    "./NixOS/Master/config/hypr/.luarc.json".text = builtins.toJSON {
       workspace = {
         library = [
           "${pkgs.hyprland}/share/hypr/stubs"
